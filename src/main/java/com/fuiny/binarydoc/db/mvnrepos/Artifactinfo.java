@@ -1,4 +1,4 @@
-package com.fuiny.binarydoc.mvnrepos.persistent;
+package com.fuiny.binarydoc.db.mvnrepos;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Basic;

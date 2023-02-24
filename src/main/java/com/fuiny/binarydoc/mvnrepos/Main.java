@@ -1,6 +1,6 @@
 package com.fuiny.binarydoc.mvnrepos;
 
-import com.fuiny.binarydoc.mvnrepos.persistent.Artifactinfo;
+import com.fuiny.binarydoc.db.mvnrepos.Artifactinfo;
 import com.google.gson.Gson;
 import jakarta.persistence.CacheStoreMode;
 import jakarta.persistence.EntityManager;
@@ -30,6 +30,11 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -75,11 +80,18 @@ public class Main {
     private static final int RADIX_DECIMAL = 10;
     private static final int STORE_PACKAGE_SIZE = 10000;
 
+    private static final Options CMD_OPTIONS = new Options();
+
     private final EntityManagerFactory emf;
 
     private Properties config;
     private IndexingContext centralContext;
     private List<Artifactinfo> dbList = new ArrayList<>();
+
+    static {
+        CMD_OPTIONS.addOption("n", "reposname", true, "Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties");
+        CMD_OPTIONS.addOption("h", "help", false, "Printout help information");
+    }
 
     private Main() throws NoSuchFieldException, IOException {
         this.emf = Persistence.createEntityManagerFactory(ENTITY_MANAGER_FACTORY, this.loadConfig());
@@ -120,10 +132,40 @@ public class Main {
         // Log formatter.
         // @see https://stackoverflow.com/questions/194765/how-do-i-get-java-logging-output-to-appear-on-a-single-line
         System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
-
         LOG.log(Level.INFO, "Started");
-        new Main().run();
+
+        CommandLine line;
+        try {
+            // parse the command line arguments
+            line = new DefaultParser().parse(Main.CMD_OPTIONS, args);
+        } catch (ParseException exp) {
+            // oops, something went wrong
+            LOG.log(Level.SEVERE, "Comand line paramter parsing failed.", exp);
+            Main.printHelp();
+            return;
+        }
+
+        if (line.hasOption("reposname")) {
+            String reposName = line.getOptionValue("reposname");
+            // TODO process this repos name
+
+            new Main().run();
+        } else {
+            Main.printHelp();
+        }
+
         LOG.log(Level.INFO, "Finished");
+    }
+
+    /**
+     * Print out help information to command line.
+     */
+    @SuppressWarnings("java:S106") // Standard outputs should not be used directly to log anything -- Help info need come to System.out
+    private static void printHelp() {
+        String jarFilename = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+
+        // Print help
+        new HelpFormatter().printHelp(String.format("java -jar %s [args...]", jarFilename), Main.CMD_OPTIONS);
     }
 
     /**
@@ -134,8 +176,8 @@ public class Main {
     public final void run() throws InterruptedException {
         try {
             long start = System.currentTimeMillis();
-            this.stepRefreshIndex("central", "https://repo1.maven.org/maven2");
-        //  this.stepRefreshIndex("spring", "https://repo.spring.io/artifactory/release");
+        //  this.stepRefreshIndex("central", "https://repo1.maven.org/maven2");
+            this.stepRefreshIndex("spring", "https://repo.spring.io/artifactory/release");
             this.stepScan();
             LOG.log(Level.INFO, "Total execution time={0}", System.currentTimeMillis() - start);
         } catch (PlexusContainerException | ComponentLookupException | IOException ex) {
