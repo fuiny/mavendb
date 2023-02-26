@@ -72,36 +72,41 @@ public class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
-    private static final String CONFIG_FILE = "etc" + File.separator + "config.properties";
+    private static final String CONFIG_FILE = "config.properties";
     private static final String ENTITY_MANAGER_FACTORY = "PUMvn";
-    private static final Gson JSON = new Gson();;
-    private static final long MAJOR_VERSION_MAX = 922;
-    private static final long MAJOR_VERSION_MAX_YEAR = 9223372036L;
-    private static final int RADIX_DECIMAL = 10;
+    private static final String REPOS_NAME = "repository";
+    private static final String REPOS_URL = "repositoryUrl";
+    private static final Gson JSON = new Gson();
     private static final int STORE_PACKAGE_SIZE = 10000;
 
     private static final Options CMD_OPTIONS = new Options();
 
     private final EntityManagerFactory emf;
+    private final Properties repos;
 
     private Properties config;
     private IndexingContext centralContext;
     private List<Artifactinfo> dbList = new ArrayList<>();
 
     static {
-        CMD_OPTIONS.addOption("n", "reposname", true, "Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties");
+        CMD_OPTIONS.addOption("r", "reposname", true, "Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
         CMD_OPTIONS.addOption("h", "help", false, "Printout help information");
     }
 
-    private Main() throws NoSuchFieldException, IOException {
+    private Main(Properties reposProp) throws NoSuchFieldException, IOException {
+        this.repos = reposProp;
         this.emf = Persistence.createEntityManagerFactory(ENTITY_MANAGER_FACTORY, this.loadConfig());
+    }
+
+    private static String getEtcDir() {
+        File baseDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        return baseDir.getParent() + File.separator + "etc" + File.separator;
     }
 
     private Properties loadConfig() throws IOException {
         if (this.config == null) {
             // Get the config file name
-            File baseDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-            String configFileName = baseDir.getParent() + File.separator + CONFIG_FILE;
+            String configFileName = getEtcDir() + CONFIG_FILE;
 
             // Load the Config values
             Properties configValues = new Properties();
@@ -147,9 +152,18 @@ public class Main {
 
         if (line.hasOption("reposname")) {
             String reposName = line.getOptionValue("reposname");
-            // TODO process this repos name
+            String reposFileName = String.format("%srepos-%s.properties", Main.getEtcDir(), reposName);
+            if (new File(reposFileName).exists()) {
+                Properties reposProp = new Properties();
+                try (BufferedReader br = new BufferedReader(new FileReader(reposFileName, StandardCharsets.UTF_8))) {
+                    reposProp.load(br);
+                }
 
-            new Main().run();
+                new Main(reposProp).run();
+            } else {
+                LOG.log(Level.SEVERE, "Repos config file does not exist: {0}", reposFileName);
+                Main.printHelp();
+            }
         } else {
             Main.printHelp();
         }
@@ -163,8 +177,6 @@ public class Main {
     @SuppressWarnings("java:S106") // Standard outputs should not be used directly to log anything -- Help info need come to System.out
     private static void printHelp() {
         String jarFilename = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-
-        // Print help
         new HelpFormatter().printHelp(String.format("java -jar %s [args...]", jarFilename), Main.CMD_OPTIONS);
     }
 
@@ -176,8 +188,11 @@ public class Main {
     public final void run() throws InterruptedException {
         try {
             long start = System.currentTimeMillis();
-        //  this.stepRefreshIndex("central", "https://repo1.maven.org/maven2");
-            this.stepRefreshIndex("spring", "https://repo.spring.io/artifactory/release");
+            // this.stepRefreshIndex("central", "https://repo1.maven.org/maven2");
+            // this.stepRefreshIndex("spring", "https://repo.spring.io/artifactory/release");
+            this.stepRefreshIndex(
+                    this.repos.getProperty(REPOS_NAME),
+                    this.repos.getProperty(REPOS_URL));
             this.stepScan();
             LOG.log(Level.INFO, "Total execution time={0}", System.currentTimeMillis() - start);
         } catch (PlexusContainerException | ComponentLookupException | IOException ex) {
@@ -208,7 +223,7 @@ public class Main {
         // Create context for central repository index
         this.centralContext = indexer.createIndexingContext(
                 repos + "-context", repos,
-                new File(repos + "-cache"), new File(repos + "-index"),         // Files where local cache is (if any) and Lucene Index should be located
+                new File(repos + "-cache"), new File(repos + "-index"), // Files where local cache is (if any) and Lucene Index should be located
                 url, null, true, true, indexers);
 
         LOG.log(Level.INFO, "Refreshing Maven Index...");
@@ -276,7 +291,7 @@ public class Main {
 
             Bits liveDocs = MultiBits.getLiveDocs(ir);
             int i = 0;
-            for (; i < ir.maxDoc(); i++ ) {
+            for (; i < ir.maxDoc(); i++) {
                 if (liveDocs == null || liveDocs.get(i)) {
                     final Document doc = ir.document(i);
                     final ArtifactInfo ai = IndexUtils.constructArtifactInfo(doc, centralContext);
@@ -313,13 +328,13 @@ public class Main {
             if (result != null && !result.isEmpty()) {
                 LOG.log(Level.FINE, "Record exists. No update needed for {0}", ai.getUinfo());
             } else {
-                VersionAnalysisResult verAr = this.toolCalculateMavenVersionSeq(ai.getVersion());
+                VersionAnalyser verAr = new VersionAnalyser(ai.getVersion());
 
                 // Prepare the Entity Object
                 Artifactinfo dbAi = new Artifactinfo(uinfoMd5);
 
-                dbAi.setMajorVersion(Math.toIntExact(verAr.majorVersion));
-                dbAi.setVersionSeq(BigInteger.valueOf(verAr.versionSeq));
+                dbAi.setMajorVersion(Math.toIntExact(verAr.getMajorVersion()));
+                dbAi.setVersionSeq(BigInteger.valueOf(verAr.getVersionSeq()));
                 dbAi.setUinfoLength(uinfo.length());
                 dbAi.setClassifierLength(StringUtils.length(ai.getClassifier()));
 
@@ -370,140 +385,124 @@ public class Main {
     }
 
     /**
-     * Get maven version sequence. The value is generated by the following
-     * logic:
-     *
-     * <pre>
-     *   9,22 3,372,036,854,775,807
-     *  |- --|- ---|--- ---|--- ---|
-     *   Maj  Min  Incre   4th
-     *
-     * The left 4 digits are Major Version;
-     * then 3 digits are Minor Version;
-     * then 6 digits are Incremental Version;
-     * then the last 4 digits are the fourth Version.
-     * </pre>
-     *
-     * Well in case we suspect the version is a date format, it will be:
-     *
-     * <pre>
-     *   9,223,372,036,854,775,807
-     *   - --- --- ---|--- ---|---|
-     *            Year   Month Date
-     * Example version text
-     * - com.hack23.cia           | citizen-intelligence-agency | 2016.12.13
-     * - org.everit.osgi.dev.dist | eosgi-dist-felix_5.2.0      | v201604220928
-     * - berkano                  | berkano-sample              | 20050805.042414
-     * </pre>
-     *
-     * @param version Version string
-     * @return <code>-1</code> calculation failed, <code>0</code> means the
-     * version format was not recognized by DefaultArtifactVersion, else succeed
-     */
-    @SuppressWarnings({"checkstyle:MagicNumber", "java:S3776"}) // java:S3776 - Cognitive Complexity of methods should not be too high
-    private VersionAnalysisResult toolCalculateMavenVersionSeq(final String version) {
-
-        final String dot = ".";
-        final String dots = "..";
-        final int yearLength = 4;  // 2000.01.01, So year's length is 4
-
-        String majorVersionStr = "";
-        long majorVersion = 0;
-        long minorVersion = 0;
-        long increVersion = 0;
-        long four4Version = 0;
-
-        String versionTemp = version.replaceAll("[^\\d.]", dot);
-        if (versionTemp.contains(dot)) {
-            while (versionTemp.contains(dots)) {
-                versionTemp = versionTemp.replace(dots, dot);
-            }
-            StringTokenizer tok = new StringTokenizer(versionTemp, dot);
-
-            if (tok.hasMoreTokens()) {
-                majorVersionStr = tok.nextToken();
-                majorVersion = NumberUtils.toLong(majorVersionStr);
-                majorVersion = (majorVersion > MAJOR_VERSION_MAX) ? MAJOR_VERSION_MAX : majorVersion;
-            }
-            if (tok.hasMoreTokens()) {
-                minorVersion = NumberUtils.toLong(tok.nextToken());
-            }
-            if (tok.hasMoreTokens()) {
-                increVersion = NumberUtils.toLong(tok.nextToken());
-            }
-            if (tok.hasMoreTokens()) {
-                four4Version = NumberUtils.toLong(tok.nextToken());
-            }
-        } else {
-            four4Version = NumberUtils.toLong(versionTemp);
-        }
-
-        long seq;
-        if (majorVersion == MAJOR_VERSION_MAX) {
-            // We suspect the version string is usually a year.month.date
-            // So we set major version as the year
-            String upTo4char = majorVersionStr.substring(0, Math.min(majorVersionStr.length(), yearLength));
-            majorVersion = NumberUtils.toLong(upTo4char);
-            seq = this.toolShrinkLong(NumberUtils.toLong(majorVersionStr), MAJOR_VERSION_MAX_YEAR) * 1000000000L + this.toolShrinkLong(minorVersion, 999999) * 1000L + this.toolShrinkLong(increVersion, 999);
-        } else {
-            // All other cases
-            seq = majorVersion * 10000000000000000L + this.toolShrinkLong(minorVersion, 9999) * 1000000000000L + this.toolShrinkLong(increVersion, 999999) * 1000000L + this.toolShrinkLong(four4Version, 999999);
-        }
-
-        return new VersionAnalysisResult(majorVersion, seq);
-    }
-
-    /**
-     * Shrink a long value to avoid it exceed the limit.
-     *
-     * @param value Value to shrink
-     * @param limit Max value allowed
-     * @return Value no more than the limit
-     */
-    private long toolShrinkLong(final long value, final long limit) {
-        long temp = value;
-        while (temp > limit) {
-            temp = temp / RADIX_DECIMAL;
-        }
-
-        return temp;
-    }
-
-    /**
      * Version string analysis result.
      */
-    public static final class VersionAnalysisResult {
+    private static final class VersionAnalyser {
 
-        private final long majorVersion;
-        private final long versionSeq;
+        private static final long MAJOR_VERSION_MAX = 922;
+        private static final long MAJOR_VERSION_MAX_YEAR = 9223372036L;
+        private static final int RADIX_DECIMAL = 10;
+        /**
+         * Length of a year string. Example: in <code>2000.01.01</code>, so
+         * year's length is 4.
+         */
+        private static final int YEAR_LENGTH = 10;
+
+        private static final String DOT = ".";
+        private static final String DOTS = "..";
+
+        private final long majorVersionResult;
+        private final long versionSeqResult;
 
         /**
-         * Constructor.
+         * Get maven version sequence. The value is generated by the following
+         * logic:
          *
-         * @param mv Major version
-         * @param vs Version Sequence
+         * <pre>
+         *   9,22 3,372,036,854,775,807
+         *  |- --|- ---|--- ---|--- ---|
+         *   Maj  Min  Incre   4th
+         *
+         * The left 4 digits are Major Version;
+         * then 3 digits are Minor Version;
+         * then 6 digits are Incremental Version;
+         * then the last 4 digits are the fourth Version.
+         * </pre>
+         *
+         * Well in case we suspect the version is a date format, it will be:
+         *
+         * <pre>
+         *   9,223,372,036,854,775,807
+         *   - --- --- ---|--- ---|---|
+         *            Year   Month Date
+         * Example version text
+         * - com.hack23.cia           | citizen-intelligence-agency | 2016.12.13
+         * - org.everit.osgi.dev.dist | eosgi-dist-felix_5.2.0      | v201604220928
+         * - berkano                  | berkano-sample              | 20050805.042414
+         * </pre>
+         *
+         * @param version Version string
          */
-        private VersionAnalysisResult(final long mv, final long vs) {
-            this.majorVersion = mv;
-            this.versionSeq = vs;
+        @SuppressWarnings({"checkstyle:MagicNumber", "java:S3776"}) // java:S3776 - Cognitive Complexity of methods should not be too high
+        private VersionAnalyser(final String version) {
+            String majorVersionStr = "";
+            long majorVersion = 0;
+            long minorVersion = 0;
+            long increVersion = 0;
+            long four4Version = 0;
+
+            String versionTemp = version.replaceAll("[^\\d.]", DOT);
+            if (versionTemp.contains(DOT)) {
+                while (versionTemp.contains(DOTS)) {
+                    versionTemp = versionTemp.replace(DOTS, DOT);
+                }
+                StringTokenizer tok = new StringTokenizer(versionTemp, DOT);
+
+                if (tok.hasMoreTokens()) {
+                    majorVersionStr = tok.nextToken();
+                    majorVersion = NumberUtils.toLong(majorVersionStr);
+                    majorVersion = (majorVersion > VersionAnalyser.MAJOR_VERSION_MAX) ? VersionAnalyser.MAJOR_VERSION_MAX : majorVersion;
+                }
+                if (tok.hasMoreTokens()) {
+                    minorVersion = NumberUtils.toLong(tok.nextToken());
+                }
+                if (tok.hasMoreTokens()) {
+                    increVersion = NumberUtils.toLong(tok.nextToken());
+                }
+                if (tok.hasMoreTokens()) {
+                    four4Version = NumberUtils.toLong(tok.nextToken());
+                }
+            } else {
+                four4Version = NumberUtils.toLong(versionTemp);
+            }
+
+            long seq;
+            if (majorVersion == VersionAnalyser.MAJOR_VERSION_MAX) {
+                // We suspect the version string is usually a year.month.date
+                // So we set major version as the year
+                String upTo4char = majorVersionStr.substring(0, Math.min(majorVersionStr.length(), YEAR_LENGTH));
+                majorVersion = NumberUtils.toLong(upTo4char);
+                seq = shrinkLong(NumberUtils.toLong(majorVersionStr),
+                        MAJOR_VERSION_MAX_YEAR) * 1000000000L + shrinkLong(minorVersion, 999999) * 1000L + shrinkLong(increVersion, 999);
+            } else {
+                // All other cases
+                seq = majorVersion * 10000000000000000L
+                        + shrinkLong(minorVersion, 9999) * 1000000000000L
+                        + shrinkLong(increVersion, 999999) * 1000000L
+                        + shrinkLong(four4Version, 999999);
+            }
+
+            // Set results
+            this.majorVersionResult = majorVersion;
+            this.versionSeqResult = seq;
         }
 
         /**
-         * Return {@link #majorVersion} value.
+         * Return {@link #majorVersionResult} value.
          *
-         * @return Value of {@link #majorVersion}
+         * @return Value of {@link #majorVersionResult}
          */
-        public long getMajorVersion() {
-            return this.majorVersion;
+        long getMajorVersion() {
+            return this.majorVersionResult;
         }
 
         /**
-         * Return {@link #versionSeq} value.
+         * Return {@link #versionSeqResult} value.
          *
-         * @return Value of {@link #versionSeq}
+         * @return Value of {@link #versionSeqResult}
          */
-        public long getVersionSeq() {
-            return this.versionSeq;
+        long getVersionSeq() {
+            return this.versionSeqResult;
         }
 
         /**
@@ -511,7 +510,23 @@ public class Main {
          */
         @Override
         public String toString() {
-            return this.majorVersion + ", " + this.versionSeq;
+            return this.majorVersionResult + ", " + this.versionSeqResult;
+        }
+
+        /**
+         * Shrink a long value to avoid it exceed the limit.
+         *
+         * @param value Value to shrink
+         * @param limit Max value allowed
+         * @return Value no more than the limit
+         */
+        private long shrinkLong(final long value, final long limit) {
+            long temp = value;
+            while (temp > limit) {
+                temp = temp / RADIX_DECIMAL;
+            }
+
+            return temp;
         }
     }
 

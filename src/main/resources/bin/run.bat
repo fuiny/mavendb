@@ -26,7 +26,7 @@ set "JAVA_OPTS=%JAVA_OPTS% -XX:FlightRecorderOptions=repository=../log "
 set "JAVA_OPTS=%JAVA_OPTS% -XX:StartFlightRecording=duration=10m,disk=true,dumponexit=true,filename=../log/profile.jfr,name=Profiling,settings=profile "
 
 
-set    RUN_CMD=%JAVA_CMD% %JAVA_OPTS% -Xmx16g -server -jar ../binarydoc-mvnrepos.jar
+set    RUN_CMD=%JAVA_CMD% %JAVA_OPTS% -Xmx16g -server -jar ../binarydoc-mvnrepos.jar central
 echo  %RUN_CMD%
 %RUN_CMD%
 
