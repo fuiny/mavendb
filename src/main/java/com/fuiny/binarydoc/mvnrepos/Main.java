@@ -333,7 +333,7 @@ public class Main {
                 // Prepare the Entity Object
                 Artifactinfo dbAi = new Artifactinfo(uinfoMd5);
 
-                dbAi.setMajorVersion(Math.toIntExact(verAr.getMajorVersion()));
+                dbAi.setMajorVersion(verAr.getMajorVersion());
                 dbAi.setVersionSeq(BigInteger.valueOf(verAr.getVersionSeq()));
                 dbAi.setUinfoLength(uinfo.length());
                 dbAi.setClassifierLength(StringUtils.length(ai.getClassifier()));
@@ -401,7 +401,11 @@ public class Main {
         private static final String DOT = ".";
         private static final String DOTS = "..";
 
-        private final long majorVersionResult;
+        /**
+         * The major version of the artifact.
+         * We don't expect the major version is too big, usually it is 1, 2, 3, etc.
+         */
+        private final int majorVersionResult;
         private final long versionSeqResult;
 
         /**
@@ -483,7 +487,7 @@ public class Main {
             }
 
             // Set results
-            this.majorVersionResult = majorVersion;
+            this.majorVersionResult = (majorVersion >= Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int)majorVersion;
             this.versionSeqResult = seq;
         }
 
@@ -492,7 +496,7 @@ public class Main {
          *
          * @return Value of {@link #majorVersionResult}
          */
-        long getMajorVersion() {
+        int getMajorVersion() {
             return this.majorVersionResult;
         }
 
