@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -79,6 +80,9 @@ public class Main {
     private static final Gson JSON = new Gson();
     private static final int STORE_PACKAGE_SIZE = 10000;
 
+    private static final String OPTION_REPOSNAME_LONGOPT = "reposname";
+    private static final Option OPTION_RESPOSNAME = new Option("r", OPTION_REPOSNAME_LONGOPT, true, "Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
+    private static final Option OPTION_HELP = new Option("h", "help", false, "Printout help information");
     private static final Options CMD_OPTIONS = new Options();
 
     private final EntityManagerFactory emf;
@@ -89,8 +93,8 @@ public class Main {
     private List<Artifactinfo> dbList = new ArrayList<>();
 
     static {
-        CMD_OPTIONS.addOption("r", "reposname", true, "Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
-        CMD_OPTIONS.addOption("h", "help", false, "Printout help information");
+        CMD_OPTIONS.addOption(OPTION_RESPOSNAME);
+        CMD_OPTIONS.addOption(OPTION_HELP);
     }
 
     private Main(Properties reposProp) throws NoSuchFieldException, IOException {
@@ -150,8 +154,8 @@ public class Main {
             return;
         }
 
-        if (line.hasOption("reposname")) {
-            String reposName = line.getOptionValue("reposname");
+        if (line.hasOption(OPTION_REPOSNAME_LONGOPT)) {
+            String reposName = line.getOptionValue(OPTION_REPOSNAME_LONGOPT);
             String reposFileName = String.format("%srepos-%s.properties", Main.getEtcDir(), reposName);
             if (new File(reposFileName).exists()) {
                 Properties reposProp = new Properties();
