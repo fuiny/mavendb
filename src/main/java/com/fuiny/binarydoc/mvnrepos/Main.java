@@ -187,13 +187,15 @@ public class Main {
     /**
      * Run the indexer.
      *
+     * Sample maven repository
+     *  - this.stepRefreshIndex("central", "https://repo1.maven.org/maven2");
+     *  - this.stepRefreshIndex("spring", "https://repo.spring.io/artifactory/release");
+     *
      * @throws InterruptedException Exception
      */
     public final void run() throws InterruptedException {
         try {
             long start = System.currentTimeMillis();
-            // this.stepRefreshIndex("central", "https://repo1.maven.org/maven2");
-            // this.stepRefreshIndex("spring", "https://repo.spring.io/artifactory/release");
             this.stepRefreshIndex(
                     this.repos.getProperty(REPOS_NAME),
                     this.repos.getProperty(REPOS_URL));
