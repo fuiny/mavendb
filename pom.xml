@@ -4,21 +4,58 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.fuiny.binarydoc</groupId>
-        <artifactId>binarydoc</artifactId>
-        <version>5.0</version>
-    </parent>
-
-    <artifactId>binarydoc-mvnrepos</artifactId>
+    <groupId>com.fuiny</groupId>
+    <artifactId>maven-repos-db</artifactId>
+    <version>5.0</version>
     <packaging>jar</packaging>
-    <name>binarydoc-mvnrepos</name>
-    <description>Analysis the Maven Index</description>
+
+    <name>maven-repos-db</name>
+    <description>Store Maven Index into database</description>
     <url>http://maven.apache.org</url>
+
+    <organization>
+        <name>Fuiny Technology</name>
+        <url>https://www.fuiny.com/</url>
+    </organization>
 
     <properties>
         <maven.build.timestamp.format>yyyyMMdd.HHmmss</maven.build.timestamp.format>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <buildnumber-maven-plugin.version>3.0.0</buildnumber-maven-plugin.version><!-- https://mvnrepository.com/artifact/org.codehaus.mojo/buildnumber-maven-plugin -->
+        <checkstyle.version>10.11.0</checkstyle.version><!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
+        <git-commit-id-maven-plugin.version>5.0.0</git-commit-id-maven-plugin.version><!-- https://mvnrepository.com/artifact/io.github.git-commit-id/git-commit-id-maven-plugin -->
+        <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+        <maven-checkstyle-plugin.version>3.2.2</maven-checkstyle-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+        <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
+        <maven-jxr-plugin.version>3.3.0</maven-jxr-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+        <spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version><!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
+
+        <commons-cli.version>1.5.0</commons-cli.version><!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
+        <commons-codec.version>1.15</commons-codec.version><!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <commons-lang3.version>3.12.0</commons-lang3.version><!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <eclipselink.version>4.0.1</eclipselink.version><!-- https://mvnrepository.com/artifact/org.eclipse.persistence/eclipselink -->
+        <gson.version>2.10.1</gson.version><!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <guice.version>5.1.0</guice.version><!-- https://mvnrepository.com/artifact/com.google.inject/guice -->
+        <indexer-core.version>7.0.1</indexer-core.version><!-- https://mvnrepository.com/artifact/org.apache.maven.indexer/indexer-core -->
+        <jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version><!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
+        <mysql-connector-j.version>8.0.33</mysql-connector-j.version><!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+        <org.eclipse.sisu.plexus.version>0.3.5</org.eclipse.sisu.plexus.version><!-- https://mvnrepository.com/artifact/org.eclipse.sisu/org.eclipse.sisu.plexus -->
+        <slf4j.version>2.0.7</slf4j.version><!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+        <spotbugs.version>4.7.3</spotbugs.version><!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs -->
     </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/fuiny/maven-repos-db</connection>
+        <developerConnection>scm:git:https://github.com/fuiny/maven-repos-db</developerConnection>
+        <url>https://github.com/fuiny/maven-repos-db</url>
+    </scm>
 
     <dependencies>
 
@@ -58,14 +95,6 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${commons-codec.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>${jaxb-api.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -149,6 +178,94 @@
 
         <plugins>
 
+            <!-- Generate git.properties -->
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>${git-commit-id-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+                    </includeOnlyProperties>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                </configuration>
+            </plugin>
+
+            <!-- Add SCM version to manifest -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>${buildnumber-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+                    <attach>true</attach>
+                    <addOutputDirectoryToResources>true</addOutputDirectoryToResources>
+                </configuration>
+            </plugin>
+ 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <!-- Add main-class manifest -->
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.fuiny.mvnreposdb.Main</mainClass>
+                        </manifest>
+
+                        <manifestEntries>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+
+                        <manifestSections>
+                            <manifestSection>
+                                <name>Versions</name>
+                                <manifestEntries>
+                                    <Implementation-Version>${project.version}</Implementation-Version>
+                                    <Implementation-SCM-Revision>${buildNumber}</Implementation-SCM-Revision>
+                                    <Implementation-SCM-Branch>${scmBranch}</Implementation-SCM-Branch>
+                                </manifestEntries>
+                            </manifestSection>
+                        </manifestSections>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Java Compiler Show Deprecation and Warnings -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
+                </configuration>
+            </plugin>
+
             <!-- Copy properties file to Target folder -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -209,22 +326,6 @@
                 </executions>
             </plugin>
 
-            <!-- Add main-class manifest -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.fuiny.binarydoc.mvnrepos.Main</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
             <!-- Assembly library -->
             <!-- https://stackoverflow.com/questions/33673260/override-maven-assembly-plugin-output-file-name -->
             <plugin>
@@ -236,7 +337,7 @@
                         <descriptor>src/main/assembly/dist.xml</descriptor>
                     </descriptors>
                     <finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
-                    <outputDirectory>${project.parent.basedir}${file.separator}dist</outputDirectory>
+                    <outputDirectory>dist</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -248,9 +349,111 @@
                 </executions>
             </plugin>
 
+            <!-- JavaDoc -->
+            <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/index.html -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <configuration>
+                    <additionalJOptions>
+                        <additionalJOption>-Xdoclint:all</additionalJOption>
+                        <additionalJOption>-Xdoclint:-missing</additionalJOption>
+                        <additionalJOption>-J-Xmx4g </additionalJOption>
+                    </additionalJOptions>
+                    <additionalOptions>-html5</additionalOptions>
+                    <detectJavaApiLink>true</detectJavaApiLink>
+                    <detectLinks>true</detectLinks>
+                    <excludePackageNames>com.fuiny.binarydoc.db.jvmadm:com.fuiny.binarydoc.db.jvm:com.fuiny.binarydoc.db.mvnrepos</excludePackageNames>
+                    <header>Binary Doc &lt;br&gt; Generate doc from Binary data &lt;br&gt; Binary Code is the Best document</header>
+                    <show>private</show>
+
+                    <!-- If the detectLinks does not work, we need to add the URL here -->
+                    <links>
+                        <link>https://docs.oracle.com/en/java/javase/11/docs/api</link>
+                        <!-- TODO When Java EE API provides Jave 11 module based javadoc, we will use the new javadoc URL
+                        <link>https://docs.oracle.com/javaee/7/api</link>
+                        -->
+                        <link>http://commons.apache.org/proper/commons-cli/javadocs/api-release</link>
+                        <link>https://maven.apache.org/maven-indexer/apidocs</link>
+                        <link>https://maven.apache.org/wagon/wagon-provider-api/apidocs</link>
+                    </links>
+                </configuration>
+            </plugin>
+
+            <!-- Avoid error: Unable to locate Source XRef to link to -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>${maven-jxr-plugin.version}</version>
+            </plugin>
+
+
+            <!-- Check Style -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <!-- <configLocation>sun_checks.xml</configLocation>    -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Spotbugs (successor of FindBugs) -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs-maven-plugin.version}</version>
+                <dependencies>
+                    <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>${spotbugs.version}</version>
+                    </dependency>
+                </dependencies>
+
+                <executions>
+                    <execution>
+                        <id>spotbugs</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
         <finalName>${project.name}</finalName>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>${maven-jxr-plugin.version}</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

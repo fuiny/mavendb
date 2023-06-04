@@ -1,6 +1,6 @@
-package com.fuiny.binarydoc.mvnrepos;
+package com.fuiny.mvnreposdb;
 
-import com.fuiny.binarydoc.db.mvnrepos.Artifactinfo;
+import com.fuiny.mvnreposdb.entity.Artifactinfo;
 import com.google.gson.Gson;
 import jakarta.persistence.CacheStoreMode;
 import jakarta.persistence.EntityManager;

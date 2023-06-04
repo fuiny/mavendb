@@ -1,4 +1,4 @@
-package com.fuiny.binarydoc.db.mvnrepos;
+package com.fuiny.mvnreposdb.entity;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Basic;
@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.codec.binary.Hex;
 import org.eclipse.persistence.annotations.Cache;
 import org.eclipse.persistence.annotations.CacheType;
@@ -21,7 +20,6 @@ import org.eclipse.persistence.annotations.CacheType;
  */
 @Entity
 @Table(name = "artifactinfo")
-@XmlRootElement
 @Cache(type = CacheType.NONE)  // Does not preserve object identity and does not cache objects.
 @NamedQueries({
     @NamedQuery(name = "Artifactinfo.findAll", query = "SELECT a FROM Artifactinfo a")
