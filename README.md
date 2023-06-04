@@ -5,8 +5,10 @@ This application will scan all maven repos items and store them to MySQL databas
 ## Build
 
 Build the Source Code
-
 * `mvn clean package install`
+
+Build and Validate
+* `mvn clean package install javadoc:aggregate jxr:jxr checkstyle:checkstyle-aggregate dependency:tree versions:display-dependency-updates`
 
 ## Run the Tool
 
