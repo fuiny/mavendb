@@ -289,6 +289,23 @@
                     </execution>
 
                     <execution>
+                        <id>copy-database</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/db</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/db</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>copy-scripts</id>
                         <phase>validate</phase>
                         <goals>
