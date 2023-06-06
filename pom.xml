@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.fuiny</groupId>
-    <artifactId>maven-repos-db</artifactId>
+    <artifactId>maven-db</artifactId>
     <version>5.0</version>
     <packaging>jar</packaging>
 
-    <name>maven-repos-db</name>
+    <name>maven-db</name>
     <description>Store Maven Index into database</description>
     <url>http://maven.apache.org</url>
 
@@ -52,9 +52,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:https://github.com/fuiny/maven-repos-db</connection>
-        <developerConnection>scm:git:https://github.com/fuiny/maven-repos-db</developerConnection>
-        <url>https://github.com/fuiny/maven-repos-db</url>
+        <connection>scm:git:https://github.com/fuiny/maven-db</connection>
+        <developerConnection>scm:git:https://github.com/fuiny/maven-db</developerConnection>
+        <url>https://github.com/fuiny/maven-db</url>
     </scm>
 
     <dependencies>

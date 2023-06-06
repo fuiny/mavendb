@@ -1,6 +1,6 @@
-# Maven Repository to DB
+# Maven repository to DB
 
-This application will scan all maven repos items and store them to MySQL database.
+This application will scan all `maven` repos items and store them to `MySQL` database.
 
 ## Build
 

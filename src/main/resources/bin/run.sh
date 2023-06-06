@@ -77,7 +77,7 @@ JAVA_OPTS="${JAVA_OPTS} \
  -XX:StartFlightRecording=disk=true,dumponexit=true,filename=../log/profile.jfr,name=Profiling,settings=profile \
 "
 
-RUN_CMD="$JAVA_CMD $JAVA_OPTS -Xmx16g -server -jar $BASEDIR/../maven-repos-db.jar -r $1"
+RUN_CMD="$JAVA_CMD $JAVA_OPTS -Xmx16g -server -jar $BASEDIR/../maven-db.jar -r $1"
 echo "$(timestamp) $RUN_CMD"
 eval               $RUN_CMD
 
