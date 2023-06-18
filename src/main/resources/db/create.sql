@@ -35,6 +35,12 @@ CREATE TABLE         `gav` (
 
   `last_modified`              DATETIME                           DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.lastModified"`',
   `size`                         bigint                           DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.size"`',
+  `sha1`                           char(  40) COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.sha1"`',
+
+  `signature_exists`                int                           DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.signatureExists"` or From [artifactinfo]-`signature_exists`, Values: NOT_PRESENT(0), PRESENT(1), NOT_AVAILABLE(2)',
+  `sources_exists`                  int                           DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.sourcesExists"`   or From [artifactinfo]-`sources_exists`,   Values: NOT_PRESENT(0), PRESENT(1), NOT_AVAILABLE(2)',
+  `javadoc_exists`                  int                           DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.javadocExists"`   or From [artifactinfo]-`javadoc_exists`,   Values: NOT_PRESENT(0), PRESENT(1), NOT_AVAILABLE(2)',
+
   `classifier`                  varchar( 128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.classifier"`',
   `classifier_length`               int                           DEFAULT NULL COMMENT 'From [artifactinfo]-`classifier_length`',
   `file_extension`              varchar( 254) COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'From [artifactinfo]-`json->>"$.fileExtension"`',   -- 2023.02.12  Max    113

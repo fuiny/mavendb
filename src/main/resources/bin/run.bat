@@ -31,6 +31,6 @@ echo  %RUN_CMD%
 %RUN_CMD%
 
 rem # echo -n "Running data-refresh.sql"
-rem # mysql --login-path=binarydocjvmadm < "$BASEDIR/data-refresh.sql"
+rem # mysql --login-path=binarydocjvmadm < "$BASEDIR/../db/data-refresh.sql"
 
 echo Finished

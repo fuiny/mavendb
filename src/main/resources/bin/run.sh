@@ -83,7 +83,7 @@ eval               $RUN_CMD
 
 echo "$(timestamp) Running data-refresh.sql"
 date
-mysql -h $dbhost -P $dbport -u $dbuser -p$dbpass -N < "$BASEDIR/data-refresh.sql"
+mysql -h $dbhost -P $dbport -u $dbuser -p$dbpass -N < "$BASEDIR/../db/data-refresh.sql"
 date
 
 echo "Finished"

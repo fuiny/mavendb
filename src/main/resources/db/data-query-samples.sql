@@ -52,3 +52,32 @@ GROUP BY group_id_left1
 ORDER BY counter desc, group_id_left1
 ;
 
+-- Get keys in the maven artifact
+SELECT json_keys(json)
+FROM `artifactinfo`
+LIMIT 100
+;
+
+-- All Keys defined in artifactinfo
+-- SEE : https://dev.mysql.com/doc/refman/8.0/en/json-table-functions.html#function_json-table
+-- WARN: This query will be very slow due to the data set size on maven central
+
+SELECT distinct json_key FROM  artifactinfo,
+  json_table(
+    json_keys(json),
+    '$[*]' COLUMNS(json_key JSON PATH '$')
+  ) t
+ORDER BY json_key
+;
+
+SELECT jt.* FROM artifactinfo,
+json_table(
+  json,
+  '$[*]' COLUMNS(
+    rowid FOR ORDINALITY,
+    groupId   JSON PATH "$.groupId"
+  )
+) jt
+limit 100
+;
+

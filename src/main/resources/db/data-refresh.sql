@@ -28,6 +28,12 @@ INSERT INTO    gav(
 
   last_modified,
   `size`,
+  sha1,
+
+  signature_exists,
+  sources_exists,
+  javadoc_exists,
+
   classifier,
   classifier_length,
   file_extension,
@@ -39,22 +45,27 @@ SELECT
   uinfo_md5,
   uinfo_length,
 
-  json->>"$.groupId"            AS group_id,
-  json->>"$.artifactId"         AS artifact_id,
-  json->>"$.version"            AS artifact_version,
+  json->>"$.groupId"                              AS group_id,
+  json->>"$.artifactId"                           AS artifact_id,
+  json->>"$.version"                              AS artifact_version,
 
   major_version,
   version_seq,
 
-  FROM_UNIXTIME(json->>"$.lastModified" / 1000)
-                                AS last_modified,
-  json->>"$.size"               AS `size`,
-  json->>"$.classifier"         AS classifier,
+  FROM_UNIXTIME(json->>"$.lastModified" / 1000)   AS last_modified,
+  json->>"$.size"                                 AS `size`,
+  json->>"$.sha1"                                 AS sha1,
+
+  signature_exists,
+  sources_exists,
+  javadoc_exists,
+
+  json->>"$.classifier"                           AS classifier,
   classifier_length,
-  json->>"$.fileExtension"      AS file_extension,
-  json->>"$.packaging"          AS packaging,
-  json->>"$.name"               AS `name`,
-  json->>"$.description"        AS description
+  json->>"$.fileExtension"                        AS file_extension,
+  json->>"$.packaging"                            AS packaging,
+  json->>"$.name"                                 AS `name`,
+  json->>"$.description"                          AS description
 FROM artifactinfo
 ;
 select concat(now(), ' Table gav refresh data finished');
