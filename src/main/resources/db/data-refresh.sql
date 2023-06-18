@@ -54,7 +54,7 @@ SELECT
 
   FROM_UNIXTIME(json->>"$.lastModified" / 1000)   AS last_modified,
   json->>"$.size"                                 AS `size`,
-  json->>"$.sha1"                                 AS sha1,
+  left(json->>"$.sha1", 40)                       AS sha1,
 
   signature_exists,
   sources_exists,

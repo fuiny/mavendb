@@ -61,6 +61,28 @@ LIMIT 100
 -- All Keys defined in artifactinfo
 -- SEE : https://dev.mysql.com/doc/refman/8.0/en/json-table-functions.html#function_json-table
 -- WARN: This query will be very slow due to the data set size on maven central
+--
+-- 18 Rows found as of June 18, 2023
+/*
+"artifactId"
+"attributes"
+"classifier"
+"context"
+"description"
+"fileExtension"
+"groupId"
+"javadocExists"
+"lastModified"
+"matchHighlights"
+"name"
+"packaging"
+"repository"
+"sha1"
+"signatureExists"
+"size"
+"sourcesExists"
+"version"
+*/
 
 SELECT distinct json_key FROM  artifactinfo,
   json_table(
@@ -69,6 +91,8 @@ SELECT distinct json_key FROM  artifactinfo,
   ) t
 ORDER BY json_key
 ;
+
+
 
 SELECT jt.* FROM artifactinfo,
 json_table(
@@ -79,5 +103,18 @@ json_table(
   )
 ) jt
 limit 100
+;
+
+-- Believe or not, the max length of sha1 in maven central is 92, as of Jun 18, 2023
+-- These wrong data is from two artifacts
+--  "groupId": "org.apache.spark", "version": "1.2.0"
+--  "groupId": "org.apache.axis2", "version": "1.0.0", "packaging": "jar", "artifactId": "axis2-transport-http-tests",
+SELECT max(length(json->>"$.sha1"))
+FROM `artifactinfo`
+;
+
+SELECT *, HEX(`uinfo_md5`) AS `uinfo_md5`
+FROM `artifactinfo`
+WHERE length(json->>"$.sha1") > 40
 ;
 
