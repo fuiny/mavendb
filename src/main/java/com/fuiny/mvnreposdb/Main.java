@@ -273,8 +273,6 @@ public class Main {
         IndexUpdateResult updateResult = indexUpdater.fetchAndUpdateIndex(updateRequest);
         if (updateResult.isFullUpdate()) {
             LOG.info("Full update happened!");
-        } else if (updateResult.getTimestamp().equals(centralContextCurrentTimestamp)) {
-            LOG.info("No update needed, index is up to date.");
         } else {
             LOG.info(String.format("Incremental update happened, change covered %s - %s period.",
                     centralContextCurrentTimestamp, updateResult.getTimestamp()));
