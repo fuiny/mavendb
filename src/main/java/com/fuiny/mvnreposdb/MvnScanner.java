@@ -51,7 +51,6 @@ import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.persistence.config.HintValues;
 import org.eclipse.persistence.config.QueryHints;
 
@@ -61,6 +60,7 @@ import org.eclipse.persistence.config.QueryHints;
 @Singleton
 @Named
 public class MvnScanner {
+
     private static final Logger LOG = Logger.getLogger(MvnScanner.class.getName());
     private static final String ENTITY_MANAGER_FACTORY = "PUMvn";
 
@@ -83,13 +83,10 @@ public class MvnScanner {
     private final IndexUpdater indexUpdater;
     private final Map<String, IndexCreator> indexCreators;
 
-    /** Context */
-    private IndexingContext reposContext;
-
     /**
-     * Maven Repository configuration.
+     * Context
      */
-    private Properties repos;
+    private IndexingContext reposContext;
 
     /**
      * Database store factory.
@@ -101,7 +98,7 @@ public class MvnScanner {
      */
     private List<Artifactinfo> dbList = new ArrayList<>();
 
-    @SuppressFBWarnings(value="EI_EXPOSE_REP2", justification="it is fine from injection")
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "it is fine from injection")
     @Inject
     public MvnScanner(Indexer indexer, IndexUpdater indexUpdater, Map<String, IndexCreator> indexCreators) {
         this.indexer = requireNonNull(indexer);
@@ -109,23 +106,17 @@ public class MvnScanner {
         this.indexCreators = requireNonNull(indexCreators);
     }
 
-    @SuppressFBWarnings(value="EI_EXPOSE_REP2", justification="it is fine from main")
-    public void perform(Properties repos, Properties config) throws IOException, InvalidVersionSpecificationException, InterruptedException {
-        this.repos = repos;
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "it is fine from main")
+    public void perform(Properties repos, Properties config) throws IOException, InterruptedException {
         this.emf = Persistence.createEntityManagerFactory(ENTITY_MANAGER_FACTORY, config);
 
-        try {
-            long start = System.currentTimeMillis();
-            this.stepRefreshIndex(
-                    this.repos.getProperty(REPOS_NAME),
-                    this.repos.getProperty(REPOS_URL));
-            this.stepScan();
-            LOG.log(Level.INFO, "Total execution time={0}", System.currentTimeMillis() - start);
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Unexpected exception happened.", ex);
-        }
+        long start = System.currentTimeMillis();
+        this.stepRefreshIndex(
+                repos.getProperty(REPOS_NAME),
+                repos.getProperty(REPOS_URL));
+        this.stepScan();
+        LOG.log(Level.INFO, "Total execution time={0}", System.currentTimeMillis() - start);
     }
-
 
     /**
      * Refresh the index (incremental update if not the first run).
@@ -142,10 +133,10 @@ public class MvnScanner {
 
         // Create context for central repository index
         this.reposContext = indexer.createIndexingContext(
-                repos + "-context",          // ID
-                repos,                       // Repository ID
-                new File(repos + "-cache"),  // Repository Directory
-                new File(repos + "-index"),  // Index Directory -  Files where local cache is (if any) and Lucene Index should be located
+                repos + "-context", // ID
+                repos, // Repository ID
+                new File(repos + "-cache"), // Repository Directory
+                new File(repos + "-index"), // Index Directory -  Files where local cache is (if any) and Lucene Index should be located
                 url, null, true, true, indexers);
 
         Instant updateStart = Instant.now();
@@ -243,6 +234,7 @@ public class MvnScanner {
 
         try (EntityManager em = emf.createEntityManager()) {
             TypedQuery<Artifactinfo> query = em.createNamedQuery("Artifactinfo.findByUinfoMd5", Artifactinfo.class);
+            // Set hints for performance
             query.setHint(QueryHints.READ_ONLY, HintValues.TRUE);
             query.setHint(QueryHints.CACHE_STORE_MODE, CacheStoreMode.BYPASS);  // Don't insert into cache
             query.setParameter("uinfoMd5", uinfoMd5);
@@ -325,8 +317,8 @@ public class MvnScanner {
         private static final String DOTS = "..";
 
         /**
-         * The major version of the artifact.
-         * We don't expect the major version is too big, usually it is 1, 2, 3, etc.
+         * The major version of the artifact. We don't expect the major version
+         * is too big, usually it is 1, 2, 3, etc.
          */
         private final int majorVersionResult;
         private final long versionSeqResult;
@@ -410,7 +402,7 @@ public class MvnScanner {
             }
 
             // Set results
-            this.majorVersionResult = (majorVersion >= Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int)majorVersion;
+            this.majorVersionResult = (majorVersion >= Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) majorVersion;
             this.versionSeqResult = seq;
         }
 
