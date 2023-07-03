@@ -118,3 +118,10 @@ FROM `artifactinfo`
 WHERE length(json->>"$.sha1") > 40
 ;
 
+
+-- Export json
+SELECT json
+FROM `artifactinfo`
+INTO outfile '/var/lib/mysql-files/artifactinfo.data'
+;
+
