@@ -1,4 +1,4 @@
-package com.fuiny.mvnreposdb.entity;
+package com.fuiny.mavendb;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Basic;

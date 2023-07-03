@@ -233,7 +233,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.fuiny.mvnreposdb.Main</mainClass>
+                            <mainClass>com.fuiny.mavendb.Main</mainClass>
                         </manifest>
 
                         <manifestEntries>

@@ -1,4 +1,4 @@
-package com.fuiny.mvnreposdb;
+package com.fuiny.mavendb;
 
 import com.google.inject.Guice;
 import java.io.BufferedReader;

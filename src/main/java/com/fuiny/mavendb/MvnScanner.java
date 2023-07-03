@@ -1,6 +1,5 @@
-package com.fuiny.mvnreposdb;
+package com.fuiny.mavendb;
 
-import com.fuiny.mvnreposdb.entity.Artifactinfo;
 import com.google.gson.Gson;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.CacheStoreMode;
