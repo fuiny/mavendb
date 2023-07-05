@@ -1,5 +1,5 @@
-CREATE SCHEMA IF NOT EXISTS `mvnrepos` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
-USE `mvnrepos`;
+CREATE SCHEMA IF NOT EXISTS `mavendb` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
+USE `mavendb`;
 
 
 DROP TABLE IF exists `artifactinfo`;

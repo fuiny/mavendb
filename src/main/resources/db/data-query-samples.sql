@@ -3,7 +3,7 @@
 SELECT 
     json->>"$.groupId"  as group_id,
     count(*)            as counter
-  FROM mvnrepos.artifactinfo
+  FROM mavendb.artifactinfo
   WHERE classifier is null
     and json->>"$.fileExtension" in (SELECT extension FROM binarydocjvmadm.extension)
     and last_modified > DATE_SUB(NOW(),INTERVAL 1 YEAR) 
@@ -15,7 +15,7 @@ SELECT
     json->>"$.groupId"     as group_id,
     json->>"$.artifactId"  as artifact_id,
     count(*)               as counter
-  FROM mvnrepos.artifactinfo
+  FROM mavendb.artifactinfo
   WHERE classifier is null
     and json->>"$.fileExtension" in (SELECT extension FROM binarydocjvmadm.extension)
     and last_modified > DATE_SUB(NOW(),INTERVAL 1 YEAR) 
@@ -27,7 +27,7 @@ SELECT
 -- Artifact Counter by Country
 
 SELECT group_id_left1, count(*) as counter
-  FROM mvnrepos.ga
+  FROM mavendb.ga
   WHERE length(group_id_left1) = 2
   group by group_id_left1
   order by counter desc
@@ -36,7 +36,7 @@ SELECT group_id_left1, count(*) as counter
 -- Artifact Counter by Company / Orgniazation
 
 SELECT group_id_left2, count(*) as counter
-FROM mvnrepos.ga
+FROM mavendb.ga
 group by group_id_left2
 order by counter desc
 ;

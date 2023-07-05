@@ -381,8 +381,7 @@
                     <additionalOptions>-html5</additionalOptions>
                     <detectJavaApiLink>true</detectJavaApiLink>
                     <detectLinks>true</detectLinks>
-                    <excludePackageNames>com.fuiny.binarydoc.db.jvmadm:com.fuiny.binarydoc.db.jvm:com.fuiny.binarydoc.db.mvnrepos</excludePackageNames>
-                    <header>Binary Doc &lt;br&gt; Generate doc from Binary data &lt;br&gt; Binary Code is the Best document</header>
+                    <header>Maven DB &lt;br&gt; Store Maven Repository data into Database</header>
                     <show>private</show>
 
                     <!-- If the detectLinks does not work, we need to add the URL here -->

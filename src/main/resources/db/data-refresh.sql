@@ -4,7 +4,7 @@
 -- Maven Central index data has bugs, we will fix theose data we are using whenver found.
 --
 
-USE mvnrepos;
+USE mavendb;
 select concat(now(), ' Started');
 
 --
