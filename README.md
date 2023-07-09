@@ -8,7 +8,7 @@ Build the Source Code
 * `mvn clean package install`
 
 Build and Validate
-* `mvn clean package install javadoc:aggregate jxr:jxr checkstyle:checkstyle-aggregate dependency:tree versions:display-dependency-updates`
+* `mvn clean package install javadoc:aggregate jxr:jxr site checkstyle:checkstyle-aggregate dependency:tree versions:display-dependency-updates`
 
 ## Run the Tool
 
