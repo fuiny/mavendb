@@ -60,6 +60,7 @@ import org.eclipse.persistence.config.QueryHints;
 @Named
 public class MvnScanner {
 
+    /** Logger. */
     private static final Logger LOG = Logger.getLogger(MvnScanner.class.getName());
     private static final String ENTITY_MANAGER_FACTORY = "PUMvn";
 
@@ -106,7 +107,7 @@ public class MvnScanner {
     }
 
     @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "it is fine from main")
-    public void perform(Properties repos, Properties config) throws IOException, InterruptedException {
+    public void perform(Properties repos, Properties config) throws IOException {
         this.emf = Persistence.createEntityManagerFactory(ENTITY_MANAGER_FACTORY, config);
 
         long start = System.currentTimeMillis();
@@ -192,10 +193,9 @@ public class MvnScanner {
      * Scan maven index files.
      *
      * @throws IOException Exception
-     * @throws InterruptedException Exception
      */
     @SuppressWarnings("java:S3776") // Cognitive Complexity of methods should not be too high
-    private void stepScan() throws IOException, InterruptedException {
+    private void stepScan() throws IOException {
         final IndexSearcher searcher = reposContext.acquireIndexSearcher();
 
         try {

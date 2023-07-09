@@ -386,13 +386,11 @@
 
                     <!-- If the detectLinks does not work, we need to add the URL here -->
                     <links>
-                        <link>https://docs.oracle.com/en/java/javase/11/docs/api</link>
-                        <!-- TODO When Java EE API provides Jave 11 module based javadoc, we will use the new javadoc URL
-                        <link>https://docs.oracle.com/javaee/7/api</link>
-                        -->
+                        <link>https://docs.oracle.com/en/java/javase/17/docs/api</link>
                         <link>http://commons.apache.org/proper/commons-cli/javadocs/api-release</link>
                         <link>https://maven.apache.org/maven-indexer/apidocs</link>
-                        <link>https://maven.apache.org/wagon/wagon-provider-api/apidocs</link>
+                        <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
+                        <link>https://javadoc.io/doc/com.google.code.gson/gson/latest/</link>
                     </links>
                 </configuration>
             </plugin>

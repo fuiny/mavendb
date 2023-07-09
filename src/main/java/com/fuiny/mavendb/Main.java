@@ -15,7 +15,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.sisu.space.BeanScanning;
 
@@ -26,24 +25,36 @@ import org.eclipse.sisu.space.BeanScanning;
  */
 public class Main {
 
+    /** Logger. */
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
+    /** Configuration file name: <code>config.properties</code>. */
     private static final String CONFIG_FILE = "config.properties";
 
-    private static final Options CMD_OPTIONS = new Options();
+    /** Command line options. */
+    private static final Options OPTIONS = new Options();
+    /** Command line option: Maven Repos name long name format. */
     private static final String OPTION_REPOSNAME_LONGOPT = "reposname";
-    private static final Option OPTION_RESPOSNAME = new Option("r", OPTION_REPOSNAME_LONGOPT, true, "Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
+    /** Command line option: Maven Repos name to scan, like central, spring. */
+    private static final Option OPTION_RESPOSNAME = new Option("r", OPTION_REPOSNAME_LONGOPT, true, "Maven Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
+    /** Command line option: print help infomation. */
     private static final Option OPTION_HELP = new Option("h", "help", false, "Printout help information");
 
     static {
-        CMD_OPTIONS.addOption(OPTION_RESPOSNAME);
-        CMD_OPTIONS.addOption(OPTION_HELP);
+        OPTIONS.addOption(OPTION_RESPOSNAME);
+        OPTIONS.addOption(OPTION_HELP);
     }
 
-    protected static String getEtcDir() {
+    /**
+     * Get the <code>etc</code> folder which contains the configuration.
+     */
+    private static String getEtcDir() {
         File baseDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         return baseDir.getParent() + File.separator + "etc" + File.separator;
     }
 
+    /**
+     * Load the {@link #CONFIG_FILE}.
+     */
     private static Properties loadConfig() throws IOException {
         // Get the config file name
         String configFileName = Main.getEtcDir() + CONFIG_FILE;
@@ -67,13 +78,9 @@ public class Main {
      * Entrance of the application.
      *
      * @param args the command line arguments
-     * @throws NoSuchFieldException Coding error: Specified DB Entity Class
-     * filed does not exist
-     * @throws InterruptedException Exception
      * @throws IOException Exception
-     * @throws InvalidVersionSpecificationException Exception
      */
-    public static void main(String[] args) throws NoSuchFieldException, InterruptedException, IOException, InvalidVersionSpecificationException {
+    public static void main(String[] args) throws IOException {
 
         // Log formatter.
         // @see https://stackoverflow.com/questions/194765/how-do-i-get-java-logging-output-to-appear-on-a-single-line
@@ -83,7 +90,7 @@ public class Main {
         CommandLine line;
         try {
             // parse the command line arguments
-            line = new DefaultParser().parse(Main.CMD_OPTIONS, args);
+            line = new DefaultParser().parse(Main.OPTIONS, args);
         } catch (ParseException exp) {
             // oops, something went wrong
             LOG.log(Level.SEVERE, "Comand line paramter parsing failed.", exp);
@@ -121,6 +128,6 @@ public class Main {
     @SuppressWarnings("java:S106") // Standard outputs should not be used directly to log anything -- Help info need come to System.out
     private static void printHelp() {
         String jarFilename = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-        new HelpFormatter().printHelp(String.format("java -jar %s [args...]", jarFilename), CMD_OPTIONS);
+        new HelpFormatter().printHelp(String.format("java -jar %s [args...]", jarFilename), OPTIONS);
     }
 }
