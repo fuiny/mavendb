@@ -13,6 +13,13 @@
     <description>Store Maven Index into database</description>
     <url>http://maven.apache.org</url>
 
+    <distributionManagement>
+        <site>
+            <id>github-com</id>
+            <url>scm:git:https://github.com/fuiny/maven-db.git</url>
+        </site>
+    </distributionManagement>
+
     <organization>
         <name>Fuiny Technology</name>
         <url>http://www.fuiny.com/</url>
@@ -35,6 +42,7 @@
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
         <maven-jxr-plugin.version>3.3.0</maven-jxr-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+        <maven-scm-publish-plugin.version>3.2.1</maven-scm-publish-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-scm-publish-plugin -->
         <spotbugs-maven-plugin.version>4.7.3.5</spotbugs-maven-plugin.version><!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 
         <commons-cli.version>1.5.0</commons-cli.version><!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
@@ -222,7 +230,7 @@
                     <addOutputDirectoryToResources>true</addOutputDirectoryToResources>
                 </configuration>
             </plugin>
- 
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -453,6 +461,17 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Publish maven site to github pages -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>${maven-scm-publish-plugin.version}</version>
+                <configuration>
+                    <scmBranch>gh-pages</scmBranch>
+                    <tryUpdate>true</tryUpdate>
+                </configuration>
             </plugin>
 
         </plugins>
