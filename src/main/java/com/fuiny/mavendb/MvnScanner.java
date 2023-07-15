@@ -10,14 +10,18 @@ import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -36,6 +40,7 @@ import javax.inject.Singleton;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiBits;
@@ -67,11 +72,11 @@ public class MvnScanner {
     /**
      * Maven Repository configuration - name.
      */
-    private static final String REPOS_NAME = "repository";
+    static final String REPOS_NAME = "repository";
     /**
      * Maven Repository configuration - URL.
      */
-    private static final String REPOS_URL = "repositoryUrl";
+    static final String REPOS_URL = "repositoryUrl";
     /**
      * Utility to convert to JSON string.
      */
@@ -110,12 +115,37 @@ public class MvnScanner {
     public void perform(Properties repos, Properties config) throws IOException {
         this.emf = Persistence.createEntityManagerFactory(ENTITY_MANAGER_FACTORY, config);
 
+        // Prepare Schema
+        this.stepExecuteSQLScript(Main.getDirectoryFileName(Main.DIR_DB, Main.DB_CREATE_SQL));
+
         long start = System.currentTimeMillis();
         this.stepRefreshIndex(
                 repos.getProperty(REPOS_NAME),
                 repos.getProperty(REPOS_URL));
         this.stepScan();
-        LOG.log(Level.INFO, "Total execution time={0}", System.currentTimeMillis() - start);
+        LOG.log(Level.INFO, "Scan execution time={0}", System.currentTimeMillis() - start);
+
+        // Refresh Data
+        this.stepExecuteSQLScript(Main.getDirectoryFileName(Main.DIR_DB, Main.DB_DATA_REFRESH_SQL));
+    }
+
+    /**
+     * Execute an SQL script.
+     *
+     * @see <a href="https://wiki.eclipse.org/EclipseLink/Examples/JPA/EMAPI#Getting_a_JDBC_Connection_from_an_EntityManager">Getting a JDBC Connection from an EntityManager</a>
+     */
+    private void stepExecuteSQLScript(String script) throws FileNotFoundException, IOException{
+        try (EntityManager em = emf.createEntityManager(); Reader r = new FileReader(script, StandardCharsets.UTF_8)) {
+            em.getTransaction().begin();
+
+            LOG.log(Level.INFO, "SQL {0} execution started", script);
+            long start = System.currentTimeMillis();
+            ScriptRunner sr = new ScriptRunner(em.unwrap(Connection.class));
+            sr.runScript(r);
+            LOG.log(Level.INFO, "SQL {0} execution finished, execution time {1} ms", new Object[]{script, System.currentTimeMillis() - start});
+
+            em.getTransaction().commit();
+        }
     }
 
     /**

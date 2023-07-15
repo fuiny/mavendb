@@ -27,8 +27,21 @@ public class Main {
 
     /** Logger. */
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
+
     /** Configuration file name: <code>config.properties</code>. */
     private static final String CONFIG_FILE = "config.properties";
+
+    /** SQL script to create schema. */
+    static final String DB_CREATE_SQL = "create.sql";
+
+    /** SQL script to refresh data. */
+    static final String DB_DATA_REFRESH_SQL = "data-refresh.sql";
+
+    /** Directory for DB scripts. */
+    static final String DIR_DB = "db";
+
+    /** Directory for Configuration files. */
+    private static final String DIR_ETC = "etc";
 
     /** Command line options. */
     private static final Options OPTIONS = new Options();
@@ -36,7 +49,7 @@ public class Main {
     private static final String OPTION_REPOSNAME_LONGOPT = "reposname";
     /** Command line option: Maven Repos name to scan, like central, spring. */
     private static final Option OPTION_RESPOSNAME = new Option("r", OPTION_REPOSNAME_LONGOPT, true, "Maven Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
-    /** Command line option: print help infomation. */
+    /** Command line option: print help information. */
     private static final Option OPTION_HELP = new Option("h", "help", false, "Printout help information");
 
     static {
@@ -45,11 +58,13 @@ public class Main {
     }
 
     /**
-     * Get the <code>etc</code> folder which contains the configuration.
+     * Get the directory which contains the configuration or scripts.
+     *
+     * @param dir Directory name, like {@link #DIR_DB}, {@link #DIR_ETC}
      */
-    private static String getEtcDir() {
+    static String getDirectoryFileName(String dir, String file) {
         File baseDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        return baseDir.getParent() + File.separator + "etc" + File.separator;
+        return baseDir.getParent() + File.separator + dir + File.separator + file;
     }
 
     /**
@@ -57,7 +72,7 @@ public class Main {
      */
     private static Properties loadConfig() throws IOException {
         // Get the config file name
-        String configFileName = Main.getEtcDir() + CONFIG_FILE;
+        String configFileName = Main.getDirectoryFileName(DIR_ETC, CONFIG_FILE);
 
         // Load the Config values
         Properties configValues = new Properties();
@@ -100,7 +115,7 @@ public class Main {
 
         if (line.hasOption(OPTION_REPOSNAME_LONGOPT)) {
             String reposName = line.getOptionValue(OPTION_REPOSNAME_LONGOPT);
-            String reposFileName = String.format("%srepos-%s.properties", getEtcDir(), reposName);
+            String reposFileName = getDirectoryFileName(DIR_ETC, String.format("repos-%s.properties", reposName));
             if (new File(reposFileName).exists()) {
                 // Load Repos Properties
                 Properties reposProp = new Properties();

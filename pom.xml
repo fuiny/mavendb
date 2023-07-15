@@ -58,6 +58,7 @@
         <guice.version>6.0.0</guice.version><!-- https://mvnrepository.com/artifact/com.google.inject/guice -->
         <indexer-core.version>7.0.3</indexer-core.version><!-- https://mvnrepository.com/artifact/org.apache.maven.indexer/indexer-core -->
         <jakarta.persistence-api.version>3.1.0</jakarta.persistence-api.version><!-- https://mvnrepository.com/artifact/jakarta.persistence/jakarta.persistence-api -->
+        <mybatis.version>3.5.13</mybatis.version><!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
         <mysql-connector-j.version>8.0.33</mysql-connector-j.version><!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <org.eclipse.sisu.inject.version>0.9.0.M2</org.eclipse.sisu.inject.version><!-- https://mvnrepository.com/artifact/org.eclipse.sisu/org.eclipse.sisu.inject -->
         <slf4j.version>2.0.7</slf4j.version><!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
@@ -150,6 +151,12 @@
             <version>${org.eclipse.sisu.inject.version}</version>
             <type>jar</type>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
         </dependency>
 
         <dependency>
