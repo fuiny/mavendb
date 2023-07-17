@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"com.fuiny.mavendb","l":"Artifactinfo"},{"p":"com.fuiny.mavendb","l":"Main"},{"p":"com.fuiny.mavendb","l":"MvnScanner"}];updateSearchResults();
