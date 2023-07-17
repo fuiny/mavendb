@@ -13,18 +13,6 @@
     <description>Store Maven Index into database</description>
     <url>http://maven.apache.org</url>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/fuiny/mavendb</url>
-        </repository>
-        <site>
-            <id>github-com</id>
-            <url>scm:git:https://github.com/fuiny/mavendb.git</url>
-        </site>
-    </distributionManagement>
-
     <organization>
         <name>Fuiny Technology</name>
         <url>http://www.fuiny.com/</url>
@@ -46,8 +34,10 @@
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
         <maven-jxr-plugin.version>3.3.0</maven-jxr-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->
+        <maven-pmd-plugin.version>3.21.0</maven-pmd-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
         <maven-scm-publish-plugin.version>3.2.1</maven-scm-publish-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-scm-publish-plugin -->
+        <maven-surefire-report-plugin.version>3.1.2</maven-surefire-report-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-report-plugin -->
         <spotbugs-maven-plugin.version>4.7.3.5</spotbugs-maven-plugin.version><!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-maven-plugin -->
 
         <commons-cli.version>1.5.0</commons-cli.version><!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
@@ -70,6 +60,21 @@
         <developerConnection>scm:git:https://github.com/fuiny/mavendb</developerConnection>
         <url>https://github.com/fuiny/mavendb</url>
     </scm>
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/fuiny/mavendb/issues</url>
+    </issueManagement>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/fuiny/mavendb</url>
+        </repository>
+        <site>
+            <id>github.com</id>
+            <url>scm:git:https://github.com/fuiny/mavendb.git</url>
+        </site>
+    </distributionManagement>
 
     <dependencies>
 
@@ -475,6 +480,12 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven-pmd-plugin.version}</version>
+            </plugin>
+
             <!-- Publish maven site to github pages -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -493,11 +504,50 @@
 
     <reporting>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
                 <version>${maven-jxr-plugin.version}</version>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven-pmd-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs-maven-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven-surefire-report-plugin.version}</version>
+            </plugin>
+
         </plugins>
     </reporting>
 
