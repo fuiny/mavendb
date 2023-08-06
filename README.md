@@ -6,14 +6,14 @@ This application will scan all `maven` repos items and store them to `MySQL` dat
 
 Requriments
 
-* Ubuntu Linux
 * OpenJDK `17` or later
 * Maven `3.9.3` or later
 
 Build the Source Code
-* `mvn clean package install dependency:tree versions:display-dependency-updates`
+* (Optional) Delete current data - `rm -rf dist/ target/`
+* `mvn clean package install dependency:tree org.codehaus.mojo:versions-maven-plugin:2.16.0:display-dependency-updates`
 
-Run the Tool
+How to Run the Tool
 * There will be an `zip` file generated inside `dist` folder
 * Unzip the file and come to the `bin` folder
 * Run either of the following commands
