@@ -15,6 +15,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.sisu.space.BeanScanning;
 
@@ -25,37 +26,35 @@ import org.eclipse.sisu.space.BeanScanning;
  */
 public class Main {
 
-    /** Logger. */
+    /**
+     * Logger.
+     */
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
-    /** Configuration file name: <code>config.properties</code>. */
+    /**
+     * Configuration file name: <code>config.properties</code>.
+     */
     private static final String CONFIG_FILE = "config.properties";
 
-    /** SQL script to create schema. */
+    /**
+     * SQL script to create schema.
+     */
     static final String DB_CREATE_SQL = "create.sql";
 
-    /** SQL script to refresh data. */
+    /**
+     * SQL script to refresh data.
+     */
     static final String DB_DATA_REFRESH_SQL = "data-refresh.sql";
 
-    /** Directory for DB scripts. */
+    /**
+     * Directory for DB scripts.
+     */
     static final String DIR_DB = "db";
 
-    /** Directory for Configuration files. */
+    /**
+     * Directory for Configuration files.
+     */
     private static final String DIR_ETC = "etc";
-
-    /** Command line options. */
-    private static final Options OPTIONS = new Options();
-    /** Command line option: Maven Repos name long name format. */
-    private static final String OPTION_REPOSNAME_LONGOPT = "reposname";
-    /** Command line option: Maven Repos name to scan, like central, spring. */
-    private static final Option OPTION_RESPOSNAME = new Option("r", OPTION_REPOSNAME_LONGOPT, true, "Maven Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
-    /** Command line option: print help information. */
-    private static final Option OPTION_HELP = new Option("h", "help", false, "Printout help information");
-
-    static {
-        OPTIONS.addOption(OPTION_RESPOSNAME);
-        OPTIONS.addOption(OPTION_HELP);
-    }
 
     /**
      * Get the directory which contains the configuration or scripts.
@@ -68,9 +67,13 @@ public class Main {
     }
 
     /**
-     * Load the {@link #CONFIG_FILE}.
+     * Load the {@link #CONFIG_FILE} or Docker <code>ENV</code>.
      */
     private static Properties loadConfig() throws IOException {
+
+        // Set Properties
+        Properties config = new Properties();
+
         // Get the config file name
         String configFileName = Main.getDirectoryFileName(DIR_ETC, CONFIG_FILE);
 
@@ -80,11 +83,26 @@ public class Main {
             configValues.load(br);
         }
 
-        // Set Properties
-        Properties config = new Properties();
-        config.setProperty(PersistenceUnitProperties.JDBC_URL, configValues.getProperty(PersistenceUnitProperties.JDBC_URL));
-        config.setProperty(PersistenceUnitProperties.JDBC_USER, configValues.getProperty(PersistenceUnitProperties.JDBC_USER));
-        config.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, configValues.getProperty(PersistenceUnitProperties.JDBC_PASSWORD));
+        String jdbcUrl = configValues.getProperty(PersistenceUnitProperties.JDBC_URL);
+        if (StringUtils.isNotBlank(System.getenv(DockerEnv.MAVENDB_MYSQL_HOST.name()))) {
+            jdbcUrl = jdbcUrl.replace("127.0.0.1", System.getenv(DockerEnv.MAVENDB_MYSQL_HOST.name()));
+        }
+        if (StringUtils.isNotBlank(System.getenv(DockerEnv.MAVENDB_MYSQL_PORT.name()))) {
+            jdbcUrl = jdbcUrl.replace("3306", System.getenv(DockerEnv.MAVENDB_MYSQL_PORT.name()));
+        }
+
+        // Set JDBC URL
+        config.setProperty(PersistenceUnitProperties.JDBC_URL, jdbcUrl);
+
+        // Set JDBC User
+        config.setProperty(PersistenceUnitProperties.JDBC_USER, StringUtils.isBlank(System.getenv(DockerEnv.MAVENDB_MYSQL_USER.name()))
+                ? configValues.getProperty(PersistenceUnitProperties.JDBC_USER)
+                : System.getenv(DockerEnv.MAVENDB_MYSQL_USER.name()));
+
+        // Set JDBC Pass
+        config.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, StringUtils.isBlank(System.getenv(DockerEnv.MAVENDB_MYSQL_PASS.name()))
+                ? configValues.getProperty(PersistenceUnitProperties.JDBC_PASSWORD)
+                : System.getenv(DockerEnv.MAVENDB_MYSQL_PASS.name()));
 
         return config;
     }
@@ -105,7 +123,7 @@ public class Main {
         CommandLine line;
         try {
             // parse the command line arguments
-            line = new DefaultParser().parse(Main.OPTIONS, args);
+            line = new DefaultParser().parse(CommandOptions.OPTIONS, args);
         } catch (ParseException exp) {
             // oops, something went wrong
             LOG.log(Level.SEVERE, "Comand line paramter parsing failed.", exp);
@@ -113,8 +131,8 @@ public class Main {
             return;
         }
 
-        if (line.hasOption(OPTION_REPOSNAME_LONGOPT)) {
-            String reposName = line.getOptionValue(OPTION_REPOSNAME_LONGOPT);
+        if (line.hasOption(CommandOptions.OPTION_REPOSNAME_LONGOPT)) {
+            String reposName = line.getOptionValue(CommandOptions.OPTION_REPOSNAME_LONGOPT);
             String reposFileName = getDirectoryFileName(DIR_ETC, String.format("repos-%s.properties", reposName));
             if (new File(reposFileName).exists()) {
                 // Load Repos Properties
@@ -143,6 +161,44 @@ public class Main {
     @SuppressWarnings("java:S106") // Standard outputs should not be used directly to log anything -- Help info need come to System.out
     private static void printHelp() {
         String jarFilename = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
-        new HelpFormatter().printHelp(String.format("java -jar %s [args...]", jarFilename), OPTIONS);
+        new HelpFormatter().printHelp(String.format("java -jar %s [args...]", jarFilename), CommandOptions.OPTIONS);
+    }
+
+    /**
+     * Command line options.
+     */
+    static final class CommandOptions {
+
+        /**
+         * Command line options.
+         */
+        private static final Options OPTIONS = new Options();
+        /**
+         * Command line option: Maven Repos name long name format.
+         */
+        private static final String OPTION_REPOSNAME_LONGOPT = "reposname";
+        /**
+         * Command line option: Maven Repos name to scan, like central, spring.
+         */
+        private static final Option OPTION_RESPOSNAME = new Option("r", OPTION_REPOSNAME_LONGOPT, true, "Maven Repos name to scan, like central, spring; the name will match to the config file at etc/repos-<the name>.properties. Example values: central, spring");
+        /**
+         * Command line option: print help information.
+         */
+        private static final Option OPTION_HELP = new Option("h", "help", false, "Printout help information");
+
+        static {
+            OPTIONS.addOption(OPTION_RESPOSNAME);
+            OPTIONS.addOption(OPTION_HELP);
+        }
+    }
+
+    /**
+     * Docker environment variables.
+     */
+    static enum DockerEnv {
+        MAVENDB_MYSQL_HOST,
+        MAVENDB_MYSQL_PORT,
+        MAVENDB_MYSQL_USER,
+        MAVENDB_MYSQL_PASS;
     }
 }

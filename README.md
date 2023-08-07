@@ -14,9 +14,12 @@ Build the Source Code
 * `mvn clean package install dependency:tree org.codehaus.mojo:versions-maven-plugin:2.16.0:display-dependency-updates`
 
 How to Run the Tool
-* There will be an `zip` file generated inside `dist` folder
-* Unzip the file and come to the `bin` folder
-* Run either of the following commands
+* There will be an `zip` file generated inside `dist` folder, Unzip the file
+* Come to the `etc` folder, edit the `config.properties` file
+  * Modify the parameter `jakarta.persistence.jdbc.url` for the MySQL hostname
+  * Modify the parameter `jakarta.persistence.jdbc.user` for the username
+  * Modify the parameter `jakarta.persistence.jdbc.password` for the password
+* Come to the `bin` folder, run either of the following commands
   * `bin $` `./run.sh central`
   * `bin $` `./run.sh spring`
 * Where
@@ -27,6 +30,9 @@ How to Run the Tool
 
 Build Docker Image
 * `sudo docker build -t fuiny/mavendb .`
+
+Check the images
+* `sudo docker images`
 
 Run the Docker
 * `sudo docker run -it --rm fuiny/mavendb`

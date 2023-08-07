@@ -15,6 +15,7 @@ ENV MAVENDB_MYSQL_HOST=localhost
 ENV MAVENDB_MYSQL_PORT=3306
 ENV MAVENDB_MYSQL_USER=fuinyadmin
 ENV MAVENDB_MYSQL_PASS=123456
+ENV MAVENDB_ARGS="-r central"
 
 RUN mkdir -p                               /opt/fuiny/mavendb
 RUN mkdir -p                               /opt/fuiny/mavendb/db
@@ -27,7 +28,7 @@ COPY --from=build /app/target/db/          /opt/fuiny/mavendb/db
 COPY --from=build /app/target/etc/         /opt/fuiny/mavendb/etc
 COPY --from=build /app/target/lib/         /opt/fuiny/mavendb/lib
 
-CMD java \
+ENTRYPOINT java \
  -showversion \
  -verbose:gc \
  -verbose:module \
@@ -46,5 +47,5 @@ CMD java \
  -XX:+DebugNonSafepoints \
  -XX:FlightRecorderOptions=repository=/opt/fuiny/mavendb/log \
  -XX:StartFlightRecording=disk=true,dumponexit=true,filename=/opt/fuiny/mavendb/log/profile.jfr,name=Profiling,settings=profile \
- -Xmx16g -server -jar /opt/fuiny/mavendb/mavendb.jar
+ -XX:MaxRAMPercentage=85 -server -jar /opt/fuiny/mavendb/mavendb.jar ${MAVENDB_ARGS}
 
