@@ -34,8 +34,22 @@ Build Docker Image
 Check the images
 * `sudo docker images`
 
-Run the Docker
-* `sudo docker run -it --rm fuiny/mavendb`
+Environment variables
+* `MAVENDB_MYSQL_HOST` - MySQL DB Hostname or IP
+* `MAVENDB_MYSQL_PORT` - MySQL DB TCP Port
+* `MAVENDB_MYSQL_USER` - MySQL DB Username
+* `MAVENDB_MYSQL_PASS` - MySQL DB Password
+* `MAVENDB_ARGS` - The `mavendb` jar file input parameters, samples as bellow
+  * `-r central` - Run against `Central` Maven
+  * `-r spring` - Run against `Spring` Maven
+
+Run
+* Run the Docker with default environment variables
+  * `sudo docker run -it --rm fuiny/mavendb`
+* Run against an MySQL Host name
+  * `sudo docker run -e MAVENDB_MYSQL_HOST=192.168.1.110 -it --rm fuiny/mavendb`
+* Run against an MySQL Host name and Central Maven
+  * `sudo docker run -e MAVENDB_MYSQL_HOST=192.168.1.110 -e MAVENDB_ARGS='-r central' -it --rm fuiny/mavendb`
 
 
 ## Publish Site (Internal Only)
