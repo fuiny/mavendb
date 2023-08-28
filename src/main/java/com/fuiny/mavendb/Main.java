@@ -186,6 +186,9 @@ public class Main {
          */
         private static final Option OPTION_HELP = new Option("h", "help", false, "Printout help information");
 
+        private CommandOptions() {
+        }
+
         static {
             OPTIONS.addOption(OPTION_RESPOSNAME);
             OPTIONS.addOption(OPTION_HELP);
@@ -195,7 +198,7 @@ public class Main {
     /**
      * Docker environment variables.
      */
-    static enum DockerEnv {
+    enum DockerEnv {
         MAVENDB_MYSQL_HOST,
         MAVENDB_MYSQL_PORT,
         MAVENDB_MYSQL_USER,

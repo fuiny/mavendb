@@ -1,5 +1,7 @@
 # Git Ignore Samples - https://github.com/github/gitignore/
 
 dist/
+mysql-data/
 target/
 .DS_Store
+

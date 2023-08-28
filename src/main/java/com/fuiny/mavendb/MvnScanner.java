@@ -134,7 +134,7 @@ public class MvnScanner {
      *
      * @see <a href="https://wiki.eclipse.org/EclipseLink/Examples/JPA/EMAPI#Getting_a_JDBC_Connection_from_an_EntityManager">Getting a JDBC Connection from an EntityManager</a>
      */
-    private void stepExecuteSQLScript(String script) throws FileNotFoundException, IOException{
+    private void stepExecuteSQLScript(String script) throws IOException{
         try (EntityManager em = emf.createEntityManager(); Reader r = new FileReader(script, StandardCharsets.UTF_8)) {
             em.getTransaction().begin();
 
@@ -189,7 +189,7 @@ public class MvnScanner {
             }
 
             @Override
-            public InputStream retrieve(String name) throws IOException, FileNotFoundException {
+            public InputStream retrieve(String name) throws IOException {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(uri.resolve(name))
                         .GET()
