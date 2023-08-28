@@ -22,6 +22,7 @@ RUN mkdir -p                               /opt/fuiny/mavendb/db
 RUN mkdir -p                               /opt/fuiny/mavendb/etc
 RUN mkdir -p                               /opt/fuiny/mavendb/lib
 RUN mkdir -p                               /opt/fuiny/mavendb/log
+RUN mkdir -p                               /opt/fuiny/mavendb/var
 
 COPY --from=build /app/target/mavendb.jar  /opt/fuiny/mavendb
 COPY --from=build /app/target/db/          /opt/fuiny/mavendb/db

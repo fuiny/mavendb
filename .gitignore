@@ -1,6 +1,8 @@
 # Git Ignore Samples - https://github.com/github/gitignore/
 
 dist/
+mavendb-log/
+mavendb-var/
 mysql-data/
 target/
 .DS_Store

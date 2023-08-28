@@ -162,11 +162,12 @@ public class MvnScanner {
         indexers.add(requireNonNull(indexCreators.get("maven-plugin")));
 
         // Create context for central repository index
+        final String varFolder = Main.getDirectoryFileName(Main.DIR_VAR, null) + File.separator;
         this.reposContext = indexer.createIndexingContext(
                 repos + "-context", // ID
                 repos, // Repository ID
-                new File(repos + "-cache"), // Repository Directory
-                new File(repos + "-index"), // Index Directory -  Files where local cache is (if any) and Lucene Index should be located
+                new File(varFolder + repos + "-cache"), // Repository Directory
+                new File(varFolder + repos + "-index"), // Index Directory -  Files where local cache is (if any) and Lucene Index should be located
                 url, null, true, true, indexers);
 
         Instant updateStart = Instant.now();
