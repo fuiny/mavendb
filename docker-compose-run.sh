@@ -2,7 +2,8 @@
 
 # Clean Docker containers, if exists
 sudo docker compose down --rmi local
-sudo rm -rf mysql-data/
+sudo rm -rf mysql-data
+sudo rm -rf mysql-files
 sudo rm -rf mavendb-log
 sudo rm -rf mavendb-var
 
