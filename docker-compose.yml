@@ -1,0 +1,107 @@
+version: '3'
+
+networks:
+  mavendbnet:
+    driver: bridge
+
+services:
+
+  # Mavendb Database
+  mavendb-mysql:
+    image: mysql:8
+    # Buffer Pool Settings based on OS RAM Size
+    #   OS RAM :  innodb_buffer_pool_size , innodb_buffer_pool_instances
+    #    16 GB                        10G , 10
+    #    32 GB                        20G , 20
+    #    64 GB                        40G , 20
+    #   128 GB                        80G , 20
+    command:
+      --bulk_insert_buffer_size=128M
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_bin
+      --default-authentication-plugin=mysql_native_password
+      --default-time-zone='+00:00'
+      --disable-log-bin
+      --group_concat_max_len=52428800
+      --innodb_buffer_pool_instances=20
+      --innodb_buffer_pool_size=40G
+      --innodb_doublewrite=0
+      --innodb_file_per_table=1
+      --innodb_flush_log_at_timeout=4
+      --innodb_flush_log_at_trx_commit=0
+      --innodb_log_buffer_size=256M
+      --innodb_log_file_size=1G
+      --innodb_log_files_in_group=4
+      --innodb_read_io_threads=64
+      --innodb_sort_buffer_size=64M
+      --innodb_write_io_threads=32
+      --key_buffer_size=1G
+      --local_infile=1
+      --log_queries_not_using_indexes=1
+      --long_query_time=2
+      --max_connections=600
+      --max_heap_table_size=5G
+      --read_rnd_buffer_size=512M
+      --slow_query_log=1
+      --skip-name-resolve
+      --sort_buffer_size=512M
+      --tmp_table_size=5G
+      --temptable_max_ram=5G
+    hostname: mavendb-mysql
+    container_name: mavendb-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'mavendb'
+      MYSQL_USER: "${MYSQL_USER}"
+      # Passwords are subjected to be changed based on your requirement
+      MYSQL_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      # Where our data will be persisted
+      - ./mysql-data:/var/lib/mysql
+      - ./mysql-files:/var/lib/mysql-files
+    expose:
+      # Opens port 3306 on the container inside the docker network
+      - '3306'
+    ports:
+      # Map docker MySQL port to hosting machine
+      - ${MYSQL_PORT}:3306
+    networks:
+      - mavendbnet
+ 
+  # Database Admin Tool
+  adminer:
+    image: adminer
+    hostname: mavendb-adminer
+    container_name: mavendb-adminer
+    restart: always
+    environment:
+      # Hostname of the DB Image
+      ADMINER_DEFAULT_SERVER: 'mavendb-mysql'
+    depends_on:
+      - mavendb-mysql
+    ports:
+      - ${ADMINER_PORT}:8080
+    networks:
+      - mavendbnet
+
+  # Database Admin Tool
+  mavendb:
+    image: fuiny/mavendb
+    hostname: mavendb
+    container_name: mavendb
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MAVENDB_MYSQL_HOST: 'mavendb-mysql'
+      MAVENDB_MYSQL_USER: "${MYSQL_USER}"
+      MAVENDB_MYSQL_PASS: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - ./mavendb-log:/opt/fuiny/mavendb/log
+      - ./mavendb-var:/opt/fuiny/mavendb/var
+    depends_on:
+      - mavendb-mysql
+    networks:
+      - mavendbnet
+

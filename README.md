@@ -48,8 +48,39 @@ Run
   * `sudo docker run -it --rm fuiny/mavendb`
 * Run against an MySQL Host name
   * `sudo docker run -e MAVENDB_MYSQL_HOST=192.168.1.110 -it --rm fuiny/mavendb`
+  * Where `192.168.1.110` is the MySQL DB Host Address
+  * Where `MAVENDB_MYSQL_PORT`, `MAVENDB_MYSQL_USER`, `MAVENDB_MYSQL_PASS`, `MAVENDB_ARGS` are the default values
 * Run against an MySQL Host name and Central Maven
   * `sudo docker run -e MAVENDB_MYSQL_HOST=192.168.1.110 -e MAVENDB_ARGS='-r central' -it --rm fuiny/mavendb`
+
+
+## Run via Pre-Configured Docker-Compose
+
+A Docker Compose file has been configured
+* [docker-compose.yml](docker-compose.yml)
+
+Step 1. Config
+- Modify the passwords set in the [.env](.env) file based on security requirements
+- Modify the `innodb_buffer_pool_size` in [docker-compose.yml](docker-compose.yml) based on hardware
+
+```
+ Buffer Pool Settings based on OS RAM Size
+   OS RAM :  innodb_buffer_pool_size , innodb_buffer_pool_instances
+    16 GB                        10G , 10
+    32 GB                        20G , 20
+    64 GB                        40G , 20
+   128 GB                        80G , 20
+```
+
+Step 2. Run
+- For `Ubuntu`/`Linux` users
+  - (Install Docker)[https://docs.docker.com/engine/install/ubuntu/]
+  - Execute script (docker-compose-run.sh)[docker-compose-run.sh]
+- For MacOS Users
+  - (Install Docker Desktop)[https://docs.docker.com/desktop/install/mac-install/]
+  - Execute script (docker-compose-run.sh)[docker-compose-run.sh]
+- For Windows Users
+  - (Install Docker Desktop)[https://docs.docker.com/desktop/install/windows-install/]
 
 
 ## Publish Site (Internal Only)

@@ -57,13 +57,23 @@ public class Main {
     private static final String DIR_ETC = "etc";
 
     /**
+     * Directory for Big cache files.
+     */
+    static final String DIR_VAR = "var";
+
+    /**
      * Get the directory which contains the configuration or scripts.
      *
-     * @param dir Directory name, like {@link #DIR_DB}, {@link #DIR_ETC}
+     * @param dir Directory name, like {@link #DIR_DB}, {@link #DIR_ETC}, {@link #DIR_VAR}
+     * @param file Add File name to result, if it is not null / not empty
      */
     static String getDirectoryFileName(String dir, String file) {
         File baseDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
-        return baseDir.getParent() + File.separator + dir + File.separator + file;
+        String result = baseDir.getParent() + File.separator + dir;
+        if (StringUtils.isNotBlank(file)) {
+            result = result + File.separator + file;
+        }
+        return result;
     }
 
     /**
