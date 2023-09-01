@@ -74,13 +74,19 @@ Step 1. Config
 
 Step 2. Run
 - For `Ubuntu`/`Linux` users
-  - (Install Docker)[https://docs.docker.com/engine/install/ubuntu/]
-  - Execute script (docker-compose-run.sh)[docker-compose-run.sh]
+  - [Install Docker](https://docs.docker.com/engine/install/ubuntu/)
+  - Execute script [docker-compose-run.sh](docker-compose-run.sh)
+    - `./docker-compose-run.sh`
 - For MacOS Users
-  - (Install Docker Desktop)[https://docs.docker.com/desktop/install/mac-install/]
-  - Execute script (docker-compose-run.sh)[docker-compose-run.sh]
+  - [Install Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
+  - Execute script [docker-compose-run.sh](docker-compose-run.sh)
+    - `./docker-compose-run.sh`
 - For Windows Users
-  - (Install Docker Desktop)[https://docs.docker.com/desktop/install/windows-install/]
+  - [Install Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
+  - Make sure the [docker memory resource limit](https://stackoverflow.com/questions/43460770/docker-windows-container-memory-limit) is bigger than the MySQL `innodb_buffer_pool_size`
+    - Example: on a 64GB RM Windows laptop, set `--innodb_buffer_pool_size=24G` will work for maven central scan
+  - Execute script [docker-compose-run.ps1](docker-compose-run.ps1)
+    - `powershell -ExecutionPolicy Bypass -File .\docker-compose-run.ps1`
 
 
 ## Publish Site (Internal Only)
