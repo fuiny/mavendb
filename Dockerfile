@@ -9,7 +9,7 @@ RUN  apt install git
 RUN  cd /app && mvn clean package
 
 # Run stage
-FROM eclipse-temurin:17-alpine
+FROM eclipse-temurin:17
 
 ENV MAVENDB_MYSQL_HOST=localhost
 ENV MAVENDB_MYSQL_PORT=3306
