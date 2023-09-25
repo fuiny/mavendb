@@ -30,6 +30,7 @@ import org.eclipse.persistence.annotations.CacheType;
 public class Artifactinfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    protected static final int UINFO_MAX_LEN = 250;
 
     @Id
     @Basic(optional = false)
@@ -51,6 +52,8 @@ public class Artifactinfo implements Serializable {
     private Integer sourcesExists;
     @Column(name = "javadoc_exists")
     private Integer javadocExists;
+    @Column(name = "uinfo")
+    private String uinfo;
 
     /**
      * We treat MySQL JSON data type as String.
@@ -152,6 +155,14 @@ public class Artifactinfo implements Serializable {
         this.javadocExists = javadocExists;
     }
 
+    public String getUinfo() {
+        return uinfo;
+    }
+
+    public void setUinfo(String uinfo) {
+        this.uinfo = uinfo;
+    }
+
     public String getJson() {
         return json;
     }
@@ -159,6 +170,5 @@ public class Artifactinfo implements Serializable {
     public void setJson(String json) {
         this.json = json;
     }
-
 
 }

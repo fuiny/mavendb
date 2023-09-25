@@ -32,7 +32,7 @@
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
         <maven-dependency-plugin.version>3.6.0</maven-dependency-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
+        <maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
         <maven-jxr-plugin.version>3.3.0</maven-jxr-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->
         <maven-pmd-plugin.version>3.21.0</maven-pmd-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version><!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
@@ -51,7 +51,7 @@
         <mybatis.version>3.5.13</mybatis.version><!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
         <mysql-connector-j.version>8.1.0</mysql-connector-j.version><!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
         <org.eclipse.sisu.inject.version>0.9.0.M2</org.eclipse.sisu.inject.version><!-- https://mvnrepository.com/artifact/org.eclipse.sisu/org.eclipse.sisu.inject -->
-        <slf4j.version>2.0.7</slf4j.version><!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+        <slf4j.version>2.0.9</slf4j.version><!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <spotbugs.version>4.7.3</spotbugs.version><!-- https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs -->
     </properties>
 

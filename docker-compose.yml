@@ -85,7 +85,26 @@ services:
     networks:
       - mavendbnet
 
-  # Database Admin Tool
+  # Rest API
+  mavendb-api:
+    image: mevdschee/php-crud-api
+    hostname: mavendb-api
+    container_name: mavendb-api
+    environment:
+      PHP_CRUD_API_DRIVER: 'mysql'
+      PHP_CRUD_API_ADDRESS: 'mavendb-mysql'
+      PHP_CRUD_API_PORT: 3306
+      PHP_CRUD_API_DATABASE: 'mavendb'
+#     PHP_CRUD_API_TABLES: 'gav'
+      PHP_CRUD_API_USERNAME: "${MYSQL_USER}"
+      PHP_CRUD_API_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      PHP_CRUD_API_DEBUG: 1
+    ports:
+      - "2080:80"
+    networks:
+      - mavendbnet
+
+  # Maven DB Program
   mavendb:
     image: fuiny/mavendb
     hostname: mavendb

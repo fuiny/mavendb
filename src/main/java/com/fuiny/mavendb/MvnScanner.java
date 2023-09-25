@@ -9,7 +9,6 @@ import jakarta.persistence.FlushModeType;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -287,6 +286,7 @@ public class MvnScanner {
                 dbAi.setSourcesExists(ai.getSourcesExists().ordinal());
                 dbAi.setJavadocExists(ai.getJavadocExists().ordinal());
 
+                dbAi.setUinfo(StringUtils.left(uinfo, Artifactinfo.UINFO_MAX_LEN));
                 dbAi.setJson(JSON.toJson(ai));
 
                 // Add to DB To be saved List

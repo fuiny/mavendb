@@ -18,6 +18,7 @@ TRUNCATE TABLE gav;
 INSERT INTO    gav(
   uinfo_md5,
   uinfo_length,
+  uinfo,
 
   group_id,
   artifact_id,
@@ -44,6 +45,7 @@ INSERT INTO    gav(
 SELECT
   uinfo_md5,
   uinfo_length,
+  uinfo,
 
   json->>"$.groupId"                              AS group_id,
   json->>"$.artifactId"                           AS artifact_id,

@@ -15,6 +15,7 @@ CREATE TABLE `artifactinfo` (
   `sources_exists`                  int                           DEFAULT NULL COMMENT 'ArtifactInfo.getSourcesExists()\norg.apache.maven.index.ArtifactAvailability: NOT_PRESENT(0), PRESENT(1), NOT_AVAILABLE(2)',
   `javadoc_exists`                  int                           DEFAULT NULL COMMENT 'ArtifactInfo.getJavadocExists()\norg.apache.maven.index.ArtifactAvailability: NOT_PRESENT(0), PRESENT(1), NOT_AVAILABLE(2)',
 
+  `uinfo`                       varchar(254)  COLLATE utf8mb4_bin     NOT NULL COMMENT 'ArtifactInfo.getUinfo()',
   `json`                           json                           DEFAULT NULL COMMENT 'toJson(ArtifactInfo)',                             -- 2023.01.01  Max 54,930
 
   PRIMARY KEY (`uinfo_md5`)
@@ -25,6 +26,7 @@ DROP TABLE IF exists `gav`;
 CREATE TABLE         `gav` (
   `uinfo_md5`                    binary(16)                           NOT NULL COMMENT 'From [artifactinfo]-`uinfo_md5`',
   `uinfo_length`                    int                           DEFAULT NULL COMMENT 'From [artifactinfo]-`uinfo_length`',
+  `uinfo`                       varchar(254)  COLLATE utf8mb4_bin     NOT NULL COMMENT 'From [artifactinfo]-`uinfo`',
 
   `group_id`                    varchar(254)  COLLATE utf8mb4_bin     NOT NULL COMMENT 'From [artifactinfo]-`json->>"$.groupId"`',         -- 2023.02.12  Max 93
   `artifact_id`                 varchar(254)  COLLATE utf8mb4_bin     NOT NULL COMMENT 'From [artifactinfo]-`json->>"$.artifactId"`',      -- 2023.02.12  Max 87
