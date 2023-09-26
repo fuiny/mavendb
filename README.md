@@ -87,6 +87,20 @@ Step 2. Run
     - Example: on a 64GB RM Windows laptop, set `--innodb_buffer_pool_size=24G` will work for maven central scan
   - Execute script [docker-compose-run.ps1](docker-compose-run.ps1)
     - `powershell -ExecutionPolicy Bypass -File .\docker-compose-run.ps1`
+- Note. In `Sep 2023`, on a machine with `innodb_buffer_pool_size=40G`, the execution time for maven central is `5.6` hours
+  - When running, maven central has `44,758,974` artifacts.
+  - Since maven central artifacts is keep improving, so the runtime will be longer and longer
+
+Step 3. Access The data
+
+- Access via DB Adminer: [http://localhost:10191/](http://localhost:10191/)
+  - Username: `fuinyadmin`, as defined in [.env](.env) file
+  - Password: use the password in [.env](.env) file
+- Access via REST API
+  - Rest API user guide see [php-crud-api#treeql](https://github.com/mevdschee/php-crud-api#treeql-a-pragmatic-graphql)
+  - Sample: [http://localhost:2080/api.php/records/gav?filter=group_id,eq,org.apache.commons&filter=artifact_id,eq,commons-lang3&size=10](http://localhost:2080/api.php/records/gav?filter=group_id,eq,org.apache.commons&filter=artifact_id,eq,commons-lang3&size=10)
+    - `group_id`: `org.apache.commons`
+    - `artifact_id`: `commons-lang3`
 
 
 ## Publish Site (Internal Only)
